@@ -15,6 +15,7 @@
     return self;
 }
 
+//初始化，简单的保存下来
 - (id)initWithView:(MAS_VIEW *)view item:(id)item layoutAttribute:(NSLayoutAttribute)layoutAttribute {
     self = [super init];
     if (!self) return nil;

@@ -55,6 +55,8 @@ typedef NS_OPTIONS(NSInteger, MASAttribute) {
  *	The following properties return a new MASViewConstraint
  *  with the first item set to the makers associated view and the appropriate MASViewAttribute
  */
+
+//property 重写了getter方法，使得每次链式调用相当于构造一个约束
 @property (nonatomic, strong, readonly) MASConstraint *left;
 @property (nonatomic, strong, readonly) MASConstraint *top;
 @property (nonatomic, strong, readonly) MASConstraint *right;

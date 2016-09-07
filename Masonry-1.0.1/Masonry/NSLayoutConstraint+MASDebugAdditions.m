@@ -12,6 +12,7 @@
 
 @implementation NSLayoutConstraint (MASDebugAdditions)
 
+//以下都是将layout对应成string，输出在description中
 #pragma mark - description maps
 
 + (NSDictionary *)layoutRelationDescriptionsByValue {
@@ -104,6 +105,7 @@
     return [NSString stringWithFormat:@"%@:%p", [obj class], obj];
 }
 
+//重写description方便调试
 - (NSString *)description {
     NSMutableString *description = [[NSMutableString alloc] initWithString:@"<"];
 

@@ -142,6 +142,7 @@
     return [self constraint:nil addConstraintWithLayoutAttribute:layoutAttribute];
 }
 
+//重写getter方法，调用.方法相当于构造约束
 - (MASConstraint *)left {
     return [self addConstraintWithLayoutAttribute:NSLayoutAttributeLeft];
 }
