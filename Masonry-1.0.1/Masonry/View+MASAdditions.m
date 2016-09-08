@@ -28,6 +28,7 @@
 - (NSArray *)mas_updateConstraints:(void(^)(MASConstraintMaker *))block {
     self.translatesAutoresizingMaskIntoConstraints = NO;
     MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];
+    //设置需要更新的key
     constraintMaker.updateExisting = YES;
     block(constraintMaker);
     return [constraintMaker install];
@@ -38,6 +39,7 @@
 - (NSArray *)mas_remakeConstraints:(void(^)(MASConstraintMaker *make))block {
     self.translatesAutoresizingMaskIntoConstraints = NO;
     MASConstraintMaker *constraintMaker = [[MASConstraintMaker alloc] initWithView:self];
+    //设置需要删除原有约束的key
     constraintMaker.removeExisting = YES;
     block(constraintMaker);
     return [constraintMaker install];

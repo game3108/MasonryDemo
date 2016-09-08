@@ -170,21 +170,33 @@ static char kInstalledConstraintsKey;
 
 - (MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {
     return ^id(id attribute, NSLayoutRelation relation) {
+        //如果是array，则是代表是多个组合对象
         if ([attribute isKindOfClass:NSArray.class]) {
+            //如果已经有relation，则报错
             NSAssert(!self.hasLayoutRelation, @"Redefinition of constraint relation");
+            //组合约束存储
             NSMutableArray *children = NSMutableArray.new;
+            //遍历每一个组合对象
             for (id attr in attribute) {
+                //复制自己,这里有个逻辑，因为在copy的时候会设置一下layoutRelation，这边的setLayoutRelation
+                //方法会把hasLayoutRelation设置为YES，单layoutRelation是默认的NSLayoutRelationEqual
                 MASViewConstraint *viewConstraint = [self copy];
+                //设置设置second attribute
                 viewConstraint.secondViewAttribute = attr;
                 [children addObject:viewConstraint];
             }
+            //初始化MASCompositeConstraint
             MASCompositeConstraint *compositeConstraint = [[MASCompositeConstraint alloc] initWithChildren:children];
             compositeConstraint.delegate = self.delegate;
+            //替换原来的位置
             [self.delegate constraint:self shouldBeReplacedWithConstraint:compositeConstraint];
             return compositeConstraint;
         } else {
+            //判断是否已经有过relation,有的话则报错
             NSAssert(!self.hasLayoutRelation || self.layoutRelation == relation && [attribute isKindOfClass:NSValue.class], @"Redefinition of constraint relation");
+            //存储relation
             self.layoutRelation = relation;
+            //设置second attribute
             self.secondViewAttribute = attribute;
             return self;
         }
@@ -296,16 +308,21 @@ static char kInstalledConstraintsKey;
 }
 
 - (void)install {
+    //已经有约束
     if (self.hasBeenInstalled) {
         return;
     }
     
+    //支持active且已经有了约束
     if ([self supportsActiveProperty] && self.layoutConstraint) {
+        //激活约束
         self.layoutConstraint.active = YES;
+        //添加约束缓存
         [self.firstViewAttribute.view.mas_installedConstraints addObject:self];
         return;
     }
     
+    //获得item1,attribute1,item2,attribute2
     MAS_VIEW *firstLayoutItem = self.firstViewAttribute.item;
     NSLayoutAttribute firstLayoutAttribute = self.firstViewAttribute.layoutAttribute;
     MAS_VIEW *secondLayoutItem = self.secondViewAttribute.item;
@@ -314,11 +331,14 @@ static char kInstalledConstraintsKey;
     // alignment attributes must have a secondViewAttribute
     // therefore we assume that is refering to superview
     // eg make.left.equalTo(@10)
+    //如果attribute是sizeattribute并且没有第二个attribute
     if (!self.firstViewAttribute.isSizeAttribute && !self.secondViewAttribute) {
+        //默认设置item2为superview
         secondLayoutItem = self.firstViewAttribute.view.superview;
         secondLayoutAttribute = firstLayoutAttribute;
     }
     
+    //生成约束
     MASLayoutConstraint *layoutConstraint
         = [MASLayoutConstraint constraintWithItem:firstLayoutItem
                                         attribute:firstLayoutAttribute
@@ -328,33 +348,46 @@ static char kInstalledConstraintsKey;
                                        multiplier:self.layoutMultiplier
                                          constant:self.layoutConstant];
     
+    //设置priority和mas_key
     layoutConstraint.priority = self.layoutPriority;
     layoutConstraint.mas_key = self.mas_key;
     
+    //如果第二个attribute有view对象
     if (self.secondViewAttribute.view) {
+        //则获取两个view的最小公共view
         MAS_VIEW *closestCommonSuperview = [self.firstViewAttribute.view mas_closestCommonSuperview:self.secondViewAttribute.view];
         NSAssert(closestCommonSuperview,
                  @"couldn't find a common superview for %@ and %@",
                  self.firstViewAttribute.view, self.secondViewAttribute.view);
+        //设置约束view为此view
         self.installedView = closestCommonSuperview;
     } else if (self.firstViewAttribute.isSizeAttribute) {
+        //如果是size attribute则为本身
         self.installedView = self.firstViewAttribute.view;
     } else {
+        //其它则是superview
         self.installedView = self.firstViewAttribute.view.superview;
     }
 
-
+    //已经存在的约束
     MASLayoutConstraint *existingConstraint = nil;
+    //需要更新
     if (self.updateExisting) {
+        //则获得此生成的约束，返回和installedview的约束是同类的约束
         existingConstraint = [self layoutConstraintSimilarTo:layoutConstraint];
     }
+    //如果存在则替换约束
     if (existingConstraint) {
         // just update the constant
         existingConstraint.constant = layoutConstraint.constant;
+        //缓存约束类型
         self.layoutConstraint = existingConstraint;
     } else {
+        //其它情况则是直接添加约束
         [self.installedView addConstraint:layoutConstraint];
+        //缓存约束类型
         self.layoutConstraint = layoutConstraint;
+        //缓存已经安装约束
         [firstLayoutItem.mas_installedConstraints addObject:self];
     }
 }
@@ -379,17 +412,22 @@ static char kInstalledConstraintsKey;
     return nil;
 }
 
+//删除约束
 - (void)uninstall {
+    //判断是否支持active去设置NSLayoutConstraint
     if ([self supportsActiveProperty]) {
+        //设置active为no
         self.layoutConstraint.active = NO;
+        //删除installed缓存
         [self.firstViewAttribute.view.mas_installedConstraints removeObject:self];
         return;
     }
     
+    //删除此约束
     [self.installedView removeConstraint:self.layoutConstraint];
     self.layoutConstraint = nil;
     self.installedView = nil;
-    
+    //删除installed缓存
     [self.firstViewAttribute.view.mas_installedConstraints removeObject:self];
 }
 

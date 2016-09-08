@@ -13,6 +13,7 @@
  *  Constraint can represent single NSLayoutConstraint (MASViewConstraint) 
  *  or a group of NSLayoutConstraints (MASComposisteConstraint)
  */
+//抽象类，使用block进行链式传递
 @interface MASConstraint : NSObject
 
 // Chaining Support

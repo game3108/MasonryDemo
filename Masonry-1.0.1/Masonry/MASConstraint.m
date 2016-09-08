@@ -160,6 +160,7 @@
 
 #pragma mark - Chaining
 
+//让子类去重写该方法，父类抛出异常达到抽象类的效果
 - (MASConstraint *)addConstraintWithLayoutAttribute:(NSLayoutAttribute __unused)layoutAttribute {
     MASMethodNotImplemented();
 }

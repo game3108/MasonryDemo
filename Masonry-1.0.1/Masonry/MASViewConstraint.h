@@ -15,16 +15,19 @@
  *  A single constraint.
  *  Contains the attributes neccessary for creating a NSLayoutConstraint and adding it to the appropriate view
  */
+//单个约束
 @interface MASViewConstraint : MASConstraint <NSCopying>
 
 /**
  *	First item/view and first attribute of the NSLayoutConstraint
  */
+//代表第一个item和相应的attribute
 @property (nonatomic, strong, readonly) MASViewAttribute *firstViewAttribute;
 
 /**
  *	Second item/view and second attribute of the NSLayoutConstraint
  */
+//代表第二个item和相应的attribute
 @property (nonatomic, strong, readonly) MASViewAttribute *secondViewAttribute;
 
 /**

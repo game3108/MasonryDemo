@@ -12,6 +12,7 @@
 @interface MASCompositeConstraint () <MASConstraintDelegate>
 
 @property (nonatomic, strong) id mas_key;
+//存储内部结构体，都是MASViewConstraint
 @property (nonatomic, strong) NSMutableArray *childConstraints;
 
 @end
@@ -81,6 +82,7 @@
 
 - (MASConstraint * (^)(id, NSLayoutRelation))equalToWithRelation {
     return ^id(id attr, NSLayoutRelation relation) {
+        //遍历所有的MASViewConstraint并设置
         for (MASConstraint *constraint in self.childConstraints.copy) {
             constraint.equalToWithRelation(attr, relation);
         }
