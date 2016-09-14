@@ -180,7 +180,10 @@ static char kInstalledConstraintsKey;
             for (id attr in attribute) {
                 //复制自己,这里有个逻辑，因为在copy的时候会设置一下layoutRelation，这边的setLayoutRelation
                 //方法会把hasLayoutRelation设置为YES，单layoutRelation是默认的NSLayoutRelationEqual
+                //这边其实比较明显有个bug，就是没有将relation在这里设置一下，所以所有的关系都会变成默认的
+                //我提交了一个pull request，等待修改
                 MASViewConstraint *viewConstraint = [self copy];
+                //viewConstraint.layoutRelation = relation;
                 //设置设置second attribute
                 viewConstraint.secondViewAttribute = attr;
                 [children addObject:viewConstraint];
